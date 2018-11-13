@@ -459,6 +459,7 @@ class ARCHModel(object):
 
         Parameters are optimized using SLSQP.
         """
+
         if self._y_original is None:
             raise RuntimeError('Cannot estimate model without data.')
         # 1. Check in ARCH or Non-normal dist.  If no ARCH and normal,
