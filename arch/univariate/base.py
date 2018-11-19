@@ -411,7 +411,8 @@ class ARCHModel(object):
 
     def fit(self, update_freq=1, disp='final', starting_values=None,
             cov_type='robust', show_warning=True, first_obs=None,
-            last_obs=None, tol=None, options=None, backcast=None):
+            last_obs=None, tol=None, options=None, backcast=None,
+            solver='SLSQP'):
         r"""
         Fits the model given a nobs by 1 vector of sigma2 values
 
@@ -558,10 +559,16 @@ class ARCHModel(object):
 
         options = {} if options is None else options
         options.setdefault('disp', disp)
-        opt = minimize(func, sv, args=args, method='SLSQP', bounds=bounds,
-                       constraints=ineq_constraints, tol=tol, callback=_callback,
-                       options=options)
 
+        if solver == 'SLSQP':
+            opt = minimize(func, sv, args=args, method=solver, bounds=bounds,
+                           constraints=ineq_constraints, tol=tol,
+                           callback=_callback, options=options)
+        elif solver in ['BFGS', 'CG']:
+            opt = minimize(func, sv, args=args, method=solver, tol=tol,
+                           callback=_callback, options=options)
+        else:
+            raise ValueError(f'{solver} is not a valid solver.')
         if show_warning:
             warnings.filterwarnings('always', '', ConvergenceWarning)
         else:
